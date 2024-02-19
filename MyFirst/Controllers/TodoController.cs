@@ -45,6 +45,7 @@ namespace MyFirst.Controllers
         [HttpGet("/")]
         public  async Task<List<TodoItem>> GetTodoItemList(string status)
         {
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
             var statuses = this.getCommaSeparatedValues(status);
 
             _logger.LogInformation(string.Join(", ", statuses));
@@ -57,6 +58,7 @@ namespace MyFirst.Controllers
         [HttpGet("/{id}")]
         public TodoItem GetTodoItemById(string id, int deeplyNestedId, int nestedId)
         {
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
             _logger.LogInformation("Getting todo item by id with id: " + id);
             
             var data = _todoDB.getTodoItemById(id);
@@ -69,7 +71,10 @@ namespace MyFirst.Controllers
         }
 
         [HttpPost("/")]
-        public async Task<TodoItem> CreateTodoItem(TodoItem todo) {
+        public async Task<TodoItem> CreateTodoItem(TodoItem todo)
+        {
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
+            
             _logger.LogInformation($"Creating new item with title: {todo.title}.");
 
             // Move to constant folder.
