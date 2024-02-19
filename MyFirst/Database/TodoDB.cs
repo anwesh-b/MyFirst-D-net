@@ -17,7 +17,7 @@ namespace MyFirst.Database
         {
         }
 
-        public async Task<List<TodoItem>> getTodoList()
+        public List<TodoItem> getTodoList()
         {
             var data = _todoColelction.Find(new BsonDocument(), new FindOptions
             {
@@ -42,6 +42,24 @@ namespace MyFirst.Database
             await _todoColelction.InsertOneAsync(todo);
 
             return todo;
+        }
+
+        public async Task<int> updateItemStatus(string id, string status)
+        {
+            // Filter
+            var filter = Builders<TodoItem>.Filter.Eq(p=>p.Id, id);
+            // Data to udpate
+            var update = Builders<TodoItem>.Update.Set("status", status);
+            
+            var updatedItem = _todoColelction.FindOneAndUpdateAsync(filter, update);
+            
+            if (updatedItem == null)
+            {
+                // Handle case where item with specified ID does not exist
+                return 0;
+            }
+            
+            return 1;
         }
     }
 }

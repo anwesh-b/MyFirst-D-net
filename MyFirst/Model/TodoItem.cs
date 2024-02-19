@@ -19,4 +19,9 @@ namespace MyFirst.Model
         
         public string? status { get; init; }
     }
+
+    public class TodoStatusUpdate
+    {
+        public string status { get; init; }
+    }
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MyFirst.Model;
 using MyFirst.Database;
 
@@ -43,14 +44,14 @@ namespace MyFirst.Controllers
         }
 
         [HttpGet("/")]
-        public  async Task<List<TodoItem>> GetTodoItemList(string status)
+        public List<TodoItem> GetTodoItemList(string status)
         {
             using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
             var statuses = this.getCommaSeparatedValues(status);
 
             _logger.LogInformation(string.Join(", ", statuses));
             
-            var data = await _todoDB.getTodoList();
+            var data = _todoDB.getTodoList();
 
             return data;
         }
@@ -76,7 +77,7 @@ namespace MyFirst.Controllers
             using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
             
             _logger.LogInformation($"Creating new item with title: {todo.title}.");
-
+            
             // Move to constant folder.
             var defaultStatus = "In Progress";
 
@@ -88,6 +89,30 @@ namespace MyFirst.Controllers
             };
             
             return await _todoDB.createTodoItem(insertData);
+        }
+
+        [HttpPatch("/{id}/status")]
+        public async Task<TodoItem> updateTaskStatus(string id, TodoStatusUpdate status)
+        { 
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(updateTaskStatus)}");
+        
+            _logger.LogInformation($"Updating status of id: {id} to {status.status}");
+            
+            var data = _todoDB.getTodoItemById(id);
+
+            if (data == null) {
+                throw new Exception("Data not found");
+            }
+
+            await _todoDB.updateItemStatus(id, status.status);
+            
+            return new TodoItem
+            {
+                Id = data.Id,
+                title = data.title,
+                description = data.description,
+                status = status.status
+            };
         }
     }
 }
