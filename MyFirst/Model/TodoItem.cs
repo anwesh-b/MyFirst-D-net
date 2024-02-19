@@ -1,5 +1,6 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -10,11 +11,12 @@ namespace MyFirst.Model
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
-        public required string title { get; set; }
+        public string? Id { get; init; }
 
-        public string? description { get; set; }
+        public required string title { get; init; }
+
+        public string? description { get; init; }
         
-        public string? status { get; set; }
+        public string? status { get; init; }
     }
 }

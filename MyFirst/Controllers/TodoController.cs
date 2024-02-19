@@ -80,9 +80,14 @@ namespace MyFirst.Controllers
             // Move to constant folder.
             var defaultStatus = "In Progress";
 
-            todo.status = defaultStatus;
+            var insertData = new TodoItem
+            {
+                title = todo.title,
+                status = defaultStatus,
+                description = todo.description
+            };
             
-            return await _todoDB.createTodoItem(todo);
+            return await _todoDB.createTodoItem(insertData);
         }
     }
 }
