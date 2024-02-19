@@ -72,7 +72,12 @@ namespace MyFirst.Controllers
         public async Task<TodoItem> CreateTodoItem(TodoItem todo) {
             _logger.LogInformation($"Creating new item with title: {todo.title}.");
 
-            return await _todoDB.createTodoItem( todo);
+            // Move to constant folder.
+            var defaultStatus = "In Progress";
+
+            todo.status = defaultStatus;
+            
+            return await _todoDB.createTodoItem(todo);
         }
     }
 }
