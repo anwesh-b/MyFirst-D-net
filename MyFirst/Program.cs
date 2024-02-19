@@ -1,5 +1,5 @@
-
 using MyFirst.Database;
+using MyFirst.Model;
 
 namespace MyFirst
 {
@@ -8,8 +8,11 @@ namespace MyFirst
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
+            // builder.Services.AddDbContext<BaseDbModel>();
+            builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoDB"));
             // Add services to the container.
+            builder.Services.AddSingleton<MongoSettings>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

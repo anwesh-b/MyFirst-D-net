@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using MyFirst.Model;
 using MyFirst.Database;
 
@@ -13,10 +14,10 @@ namespace MyFirst.Controllers
         private readonly TodoDB _todoDB;
 
         // Constructor
-        public TodoController(ILogger<TodoController> logger)
+        public TodoController(ILogger<TodoController> logger, IOptions<MongoSettings> mongoSettings)
         {
             _logger = logger;
-            _todoDB = new TodoDB();
+            _todoDB = new TodoDB(mongoSettings);
         }
 
         private string[] getCommaSeparatedValues(string input) {
@@ -42,7 +43,7 @@ namespace MyFirst.Controllers
         }
 
         [HttpGet("/")]
-        public  async Task<TodoItem[]> GetTodoItemList(string status)
+        public  async Task<List<TodoItem>> GetTodoItemList(string status)
         {
             var statuses = this.getCommaSeparatedValues(status);
 
@@ -54,10 +55,9 @@ namespace MyFirst.Controllers
         }
 
         [HttpGet("/{id}")]
-        public TodoItem GetTodoItemById(int id, int deeplyNestedId, int nestedId)
+        public TodoItem GetTodoItemById(string id, int deeplyNestedId, int nestedId)
         {
             _logger.LogInformation("Getting todo item by id with id: " + id);
-            _logger.LogError("Nested id: " + nestedId + " Deeply nested id: " + deeplyNestedId);
             
             var data = _todoDB.getTodoItemById(id);
 
@@ -69,10 +69,10 @@ namespace MyFirst.Controllers
         }
 
         [HttpPost("/")]
-        public TodoItem CreateTodoItem(TodoItem todo) {
+        public async Task<TodoItem> CreateTodoItem(TodoItem todo) {
             _logger.LogInformation($"Creating new item with title: {todo.title}.");
 
-            return _todoDB.createTodoItem();
+            return await _todoDB.createTodoItem( todo);
         }
     }
 }
