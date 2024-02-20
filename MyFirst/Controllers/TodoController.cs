@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MyFirst.Model;
 using MyFirst.Database;
 
@@ -20,9 +17,9 @@ namespace MyFirst.Controllers
         {
             _logger = logger;
             _todoDB = todoDb;
-            // _todoDB.getTodoList();
         }
 
+        // Need to define to ignore in swagger.json
         [NonAction]
         public string[] getCommaSeparatedValues(string input) {
             string[] commaSeparatedValues = input.Split(',');
@@ -60,63 +57,63 @@ namespace MyFirst.Controllers
             return data;
         }
 
-        // [HttpGet("/{id}")]
-        // public TodoItem GetTodoItemById(string id)
-        // {
-        //     using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
-        //     _logger.LogInformation("Getting todo item by id with id: " + id);
-        //     
-        //     var data = _todoDB.getTodoItemById(id);
-        //
-        //     if (data == null) {
-        //         throw new Exception("Data not found");
-        //     }
-        //
-        //     return data;
-        // }
-        //
-        // [HttpPost("/")]
-        // public async Task<TodoItem> CreateTodoItem(TodoItem todo)
-        // {
-        //     using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
-        //     
-        //     _logger.LogInformation($"Creating new item with title: {todo.title}.");
-        //     
-        //     // Move to constant folder.
-        //     var defaultStatus = "In Progress";
-        //
-        //     var insertData = new TodoItem
-        //     {
-        //         title = todo.title,
-        //         status = defaultStatus,
-        //         description = todo.description
-        //     };
-        //     
-        //     return await _todoDB.createTodoItem(insertData);
-        // }
-        //
-        // [HttpPatch("/{id}/status")]
-        // public async Task<TodoItem> updateTaskStatus(string id, TodoStatusUpdate status)
-        // { 
-        //     using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(updateTaskStatus)}");
-        //
-        //     _logger.LogInformation($"Updating status of id: {id} to {status.status}");
-        //     
-        //     var data = _todoDB.getTodoItemById(id);
-        //
-        //     if (data == null) {
-        //         throw new Exception("Data not found");
-        //     }
-        //
-        //     await _todoDB.updateItemStatus(id, status.status);
-        //     
-        //     return new TodoItem
-        //     {
-        //         Id = data.Id,
-        //         title = data.title,
-        //         description = data.description,
-        //         status = status.status
-        //     };
-        // }
+        [HttpGet("/{id}")]
+        public TodoItem GetTodoItemById(string id)
+        {
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
+            _logger.LogInformation("Getting todo item by id with id: " + id);
+            
+            var data = _todoDB.getTodoItemById(id);
+        
+            if (data == null) {
+                throw new Exception("Data not found");
+            }
+        
+            return data;
+        }
+        
+        [HttpPost("/")]
+        public async Task<TodoItem> CreateTodoItem(TodoItem todo)
+        {
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
+            
+            _logger.LogInformation($"Creating new item with title: {todo.title}.");
+            
+            // Move to constant folder.
+            var defaultStatus = "In Progress";
+        
+            var insertData = new TodoItem
+            {
+                title = todo.title,
+                status = defaultStatus,
+                description = todo.description
+            };
+            
+            return await _todoDB.createTodoItem(insertData);
+        }
+        
+        [HttpPatch("/{id}/status")]
+        public async Task<TodoItem> updateTaskStatus(string id, TodoStatusUpdate status)
+        { 
+            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(updateTaskStatus)}");
+        
+            _logger.LogInformation($"Updating status of id: {id} to {status.status}");
+            
+            var data = _todoDB.getTodoItemById(id);
+        
+            if (data == null) {
+                throw new Exception("Data not found");
+            }
+        
+            await _todoDB.updateItemStatus(id, status.status);
+            
+            return new TodoItem
+            {
+                Id = data.Id,
+                title = data.title,
+                description = data.description,
+                status = status.status
+            };
+        }
     }
 }

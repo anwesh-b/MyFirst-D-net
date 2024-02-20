@@ -11,4 +11,7 @@ public interface ITodoController
     string[] getCommaSeparatedValues(string input);
 
     T[] getCommaSeparatedValues<T>(string input);
+    TodoItem GetTodoItemById(string id);
+    Task<TodoItem> CreateTodoItem(TodoItem todo);
+    Task<TodoItem> updateTaskStatus(string id, TodoStatusUpdate status);
 }
