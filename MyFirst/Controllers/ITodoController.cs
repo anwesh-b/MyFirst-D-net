@@ -8,10 +8,10 @@ public interface ITodoController
 
     List<TodoItem> GetTodoItemList(string status);
 
-    string[] getCommaSeparatedValues(string input);
+    string[] GetCommaSeparatedValues(string input);
 
-    T[] getCommaSeparatedValues<T>(string input);
+    T[] GetCommaSeparatedValues<T>(string input);
     TodoItem GetTodoItemById(string id);
     Task<TodoItem> CreateTodoItem(TodoItem todo);
-    Task<TodoItem> updateTaskStatus(string id, TodoStatusUpdate status);
+    Task<TodoItem> UpdateTaskStatus(string id, TodoStatusUpdate status);
 }

@@ -4,7 +4,7 @@ using MyFirst.Model;
 
 namespace MyFirst
 {
-    public class Program
+    public abstract class Program
     {
         public static void Main(string[] args)
         {
@@ -14,7 +14,7 @@ namespace MyFirst
             builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoDB"));
             // Add services to the container.
             builder.Services.AddSingleton<MongoSettings>();
-            builder.Services.AddScoped<ITodoDB, TodoDB >();
+            builder.Services.AddScoped<ITodoDb, TodoDb >();
             builder.Services.AddScoped<ITodoController, TodoController >();
             // builder.Services.AddScoped( typeof(IBaseDB<>), typeof(BaseDB<>));
 

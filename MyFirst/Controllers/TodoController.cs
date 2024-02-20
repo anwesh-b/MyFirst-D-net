@@ -6,33 +6,25 @@ namespace MyFirst.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TodoController : ControllerBase, ITodoController
+    // Converted to primary constructor.
+    public class TodoController(ILogger<ITodoController> logger, ITodoDb todoDb) : ControllerBase, ITodoController
     {
-        private readonly ILogger<ITodoController> _logger;
-        
-        public ITodoDB _todoDB;
-
         // Constructor
-        public TodoController(ILogger<ITodoController> logger,  ITodoDB todoDb)
-        {
-            _logger = logger;
-            _todoDB = todoDb;
-        }
 
         // Need to define to ignore in swagger.json
         [NonAction]
-        public string[] getCommaSeparatedValues(string input) {
-            string[] commaSeparatedValues = input.Split(',');
+        public string[] GetCommaSeparatedValues(string input) {
+            var commaSeparatedValues = input.Split(',');
 
             return commaSeparatedValues;
         }
 
         [NonAction]
-        public T[] getCommaSeparatedValues<T>(string input)
+        public T[] GetCommaSeparatedValues<T>(string input)
         {
-            string[] commaSeparatedValues = input.Split(',');
+            var commaSeparatedValues = input.Split(',');
 
-            T[] convertedArray = new T[commaSeparatedValues.Length];
+            var convertedArray = new T[commaSeparatedValues.Length];
             
             for (int i = 0; i < commaSeparatedValues.Length; i++)
             {
@@ -47,12 +39,12 @@ namespace MyFirst.Controllers
         [HttpGet("/")]
         public List<TodoItem> GetTodoItemList(string status)
         {
-            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
-            var statuses = this.getCommaSeparatedValues(status);
+            using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
+            var statuses = this.GetCommaSeparatedValues(status);
 
-            _logger.LogInformation(string.Join(", ", statuses));
+            logger.LogInformation($"Getting all todo list with statuses: ${string.Join(", ", statuses)}");
             
-            var data = _todoDB.getTodoList();
+            var data = todoDb.GetTodoList();
 
             return data;
         }
@@ -60,10 +52,10 @@ namespace MyFirst.Controllers
         [HttpGet("/{id}")]
         public TodoItem GetTodoItemById(string id)
         {
-            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
-            _logger.LogInformation("Getting todo item by id with id: " + id);
+            using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
+            logger.LogInformation($"Getting todo item by id with id: {id}.");
             
-            var data = _todoDB.getTodoItemById(id);
+            var data = todoDb.GetTodoItemById(id);
         
             if (data == null) {
                 throw new Exception("Data not found");
@@ -75,9 +67,9 @@ namespace MyFirst.Controllers
         [HttpPost("/")]
         public async Task<TodoItem> CreateTodoItem(TodoItem todo)
         {
-            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
+            using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
             
-            _logger.LogInformation($"Creating new item with title: {todo.title}.");
+            logger.LogInformation($"Creating new item with title: {todo.title}.");
             
             // Move to constant folder.
             var defaultStatus = "In Progress";
@@ -89,23 +81,23 @@ namespace MyFirst.Controllers
                 description = todo.description
             };
             
-            return await _todoDB.createTodoItem(insertData);
+            return await todoDb.CreateTodoItem(insertData);
         }
         
         [HttpPatch("/{id}/status")]
-        public async Task<TodoItem> updateTaskStatus(string id, TodoStatusUpdate status)
+        public async Task<TodoItem> UpdateTaskStatus(string id, TodoStatusUpdate status)
         { 
-            using var scope = _logger.BeginScope($"{nameof(TodoController)}.{nameof(updateTaskStatus)}");
+            using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(UpdateTaskStatus)}");
         
-            _logger.LogInformation($"Updating status of id: {id} to {status.status}");
+            logger.LogInformation($"Updating status of id: {id} to {status.status}");
             
-            var data = _todoDB.getTodoItemById(id);
+            var data = todoDb.GetTodoItemById(id);
         
             if (data == null) {
                 throw new Exception("Data not found");
             }
         
-            await _todoDB.updateItemStatus(id, status.status);
+            await todoDb.UpdateItemStatus(id, status.status);
             
             return new TodoItem
             {

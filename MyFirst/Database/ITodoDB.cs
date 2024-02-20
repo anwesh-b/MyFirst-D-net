@@ -2,13 +2,13 @@ using MyFirst.Model;
 
 namespace MyFirst.Database;
 
-public interface ITodoDB
+public interface ITodoDb
 {
-    List<TodoItem> getTodoList();
+    List<TodoItem> GetTodoList();
 
-    TodoItem getTodoItemById(string id);
+    TodoItem GetTodoItemById(string id);
     
-    Task<TodoItem> createTodoItem(TodoItem todo);
+    Task<TodoItem> CreateTodoItem(TodoItem todo);
     
-    Task<int> updateItemStatus(string id, string status);
+    Task<int> UpdateItemStatus(string id, string status);
 }

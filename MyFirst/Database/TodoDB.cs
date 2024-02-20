@@ -5,20 +5,20 @@ using MyFirst.Model;
 
 namespace MyFirst.Database
 {
-    public class TodoDB: ITodoDB
+    public class TodoDb: ITodoDb
     {
-        protected readonly IMongoCollection<TodoItem> _todoColelction;
+        private readonly IMongoCollection<TodoItem> _todoCollection;
 
-        public TodoDB(IOptions<MongoSettings> options)
+        public TodoDb(IOptions<MongoSettings> options)
         {
-         MongoClient client = new MongoClient(options.Value.ConenctionUri);
-         IMongoDatabase database = client.GetDatabase(options.Value.Database);
-         _todoColelction =  database.GetCollection<TodoItem>("todo");
+            var client = new MongoClient(options.Value.ConnectionUri);
+            var database = client.GetDatabase(options.Value.Database);
+            _todoCollection =  database.GetCollection<TodoItem>("todo");
         }
 
-        public List<TodoItem> getTodoList()
+        public List<TodoItem> GetTodoList()
         {
-            var data = _todoColelction.Find(new BsonDocument(), new FindOptions
+            var data = _todoCollection.Find(new BsonDocument(), new FindOptions
             {
                 // Not sure what this does :thinking:
                 BatchSize = 3
@@ -28,37 +28,32 @@ namespace MyFirst.Database
             return data.ToList();
         }
         
-        public TodoItem getTodoItemById(string id)
+        public TodoItem GetTodoItemById(string id)
         {
-            var data = _todoColelction.Find(data => data.Id == id).FirstOrDefault();
-            // var todoitem= new TodoItem { Id = "1", title = "Title", description = "Description" };
+            var data = _todoCollection.Find(data => data.Id == id).FirstOrDefault();
         
             return data;
         }
         
-        public async Task<TodoItem> createTodoItem(TodoItem todo) {
+        public async Task<TodoItem> CreateTodoItem(TodoItem todo) {
             // Insert status
-            await _todoColelction.InsertOneAsync(todo);
+            await _todoCollection.InsertOneAsync(todo);
         
             return todo;
         }
         
-        public async Task<int> updateItemStatus(string id, string status)
+        public async Task<int> UpdateItemStatus(string id, string status)
         {
             // Filter
             var filter = Builders<TodoItem>.Filter.Eq(p=>p.Id, id);
             // Data to udpate
             var update = Builders<TodoItem>.Update.Set("status", status);
             
-            var updatedItem = _todoColelction.FindOneAndUpdateAsync(filter, update);
+            var updatedItem = await _todoCollection.FindOneAndUpdateAsync(filter, update);
             
-            if (updatedItem == null)
-            {
+            return updatedItem == null ?
                 // Handle case where item with specified ID does not exist
-                return 0;
-            }
-            
-            return 1;
+                0 : 1;
         }
     }
 }
