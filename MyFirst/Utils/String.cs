@@ -1,15 +1,15 @@
 namespace MyFirst.Utils;
 
-public abstract class StringUtil
+public class StringUtil: IStringUtil
 {
     // Need to define to ignore in swagger.json
-    public static string[] GetCommaSeparatedValues(string input) {
+    public string[] GetCommaSeparatedValues(string input) {
         var commaSeparatedValues = input.Split(',');
 
         return commaSeparatedValues;
     }
 
-    public static T[] GetCommaSeparatedValues<T>(string input)
+    public T[] GetCommaSeparatedValues<T>(string input)
     {
         var commaSeparatedValues = input.Split(',');
 

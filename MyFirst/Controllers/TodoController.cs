@@ -9,13 +9,13 @@ namespace MyFirst.Controllers
     [ApiController]
     [Route("[controller]")]
     // Converted to primary constructor.
-    public class TodoController(ILogger<ITodoController> logger, ITodoDb todoDb) : ControllerBase, ITodoController
+    public class TodoController(ILogger<ITodoController> logger, ITodoDb todoDb, IStringUtil stringUtil) : ControllerBase, ITodoController
     {
         [HttpGet("/")]
         public List<TodoItem> GetTodoItemList(string? status)
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
-            var statuses = status != null ? StringUtil.GetCommaSeparatedValues(status) : null;
+            var statuses = status != null ? stringUtil.GetCommaSeparatedValues(status) : null;
 
             if (statuses != null)
             {
