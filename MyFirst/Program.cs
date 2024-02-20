@@ -1,3 +1,4 @@
+using MyFirst.Controllers;
 using MyFirst.Database;
 using MyFirst.Model;
 
@@ -13,6 +14,9 @@ namespace MyFirst
             builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoDB"));
             // Add services to the container.
             builder.Services.AddSingleton<MongoSettings>();
+            builder.Services.AddScoped<ITodoDB, TodoDB >();
+            builder.Services.AddScoped<ITodoController, TodoController >();
+            // builder.Services.AddScoped( typeof(IBaseDB<>), typeof(BaseDB<>));
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
