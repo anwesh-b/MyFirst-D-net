@@ -1,6 +1,8 @@
+using System.Drawing;
 using Microsoft.AspNetCore.Mvc;
 using MyFirst.Model;
 using MyFirst.Database;
+using MyFirst.Utils;
 
 namespace MyFirst.Controllers
 {
@@ -9,38 +11,11 @@ namespace MyFirst.Controllers
     // Converted to primary constructor.
     public class TodoController(ILogger<ITodoController> logger, ITodoDb todoDb) : ControllerBase, ITodoController
     {
-        // Constructor
-
-        // Need to define to ignore in swagger.json
-        [NonAction]
-        public string[] GetCommaSeparatedValues(string input) {
-            var commaSeparatedValues = input.Split(',');
-
-            return commaSeparatedValues;
-        }
-
-        [NonAction]
-        public T[] GetCommaSeparatedValues<T>(string input)
-        {
-            var commaSeparatedValues = input.Split(',');
-
-            var convertedArray = new T[commaSeparatedValues.Length];
-            
-            for (int i = 0; i < commaSeparatedValues.Length; i++)
-            {
-
-                var res = Convert.ChangeType(commaSeparatedValues[i], typeof(T));       
-                convertedArray.SetValue(res, i);
-            }
-
-            return convertedArray;
-        }
-
         [HttpGet("/")]
         public List<TodoItem> GetTodoItemList(string status)
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
-            var statuses = this.GetCommaSeparatedValues(status);
+            var statuses = StringUtil.GetCommaSeparatedValues(status);
 
             logger.LogInformation($"Getting all todo list with statuses: ${string.Join(", ", statuses)}");
             
