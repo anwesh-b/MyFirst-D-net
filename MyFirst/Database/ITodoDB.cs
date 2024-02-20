@@ -4,7 +4,7 @@ namespace MyFirst.Database;
 
 public interface ITodoDb
 {
-    List<TodoItem> GetTodoList();
+    List<TodoItem> GetTodoList(TodoFilterGenerator? options);
 
     TodoItem GetTodoItemById(string id);
     

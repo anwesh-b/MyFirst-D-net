@@ -12,14 +12,26 @@ namespace MyFirst.Controllers
     public class TodoController(ILogger<ITodoController> logger, ITodoDb todoDb) : ControllerBase, ITodoController
     {
         [HttpGet("/")]
-        public List<TodoItem> GetTodoItemList(string status)
+        public List<TodoItem> GetTodoItemList(string? status)
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
-            var statuses = StringUtil.GetCommaSeparatedValues(status);
+            var statuses = status != null ? StringUtil.GetCommaSeparatedValues(status) : null;
 
-            logger.LogInformation($"Getting all todo list with statuses: ${string.Join(", ", statuses)}");
-            
-            var data = todoDb.GetTodoList();
+            if (statuses != null)
+            {
+                var statusesLog = string.Join(", ", statuses); 
+                logger.LogInformation("Getting all todo list with statuses: {statusesLog}.", statusesLog);
+            }
+            else
+            {
+                logger.LogInformation("Getting all todo list.");
+                
+            }
+
+            var data = todoDb.GetTodoList(new TodoFilterGenerator
+            {
+                Status = statuses
+            });
 
             return data;
         }
@@ -28,7 +40,7 @@ namespace MyFirst.Controllers
         public TodoItem GetTodoItemById(string id)
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
-            logger.LogInformation($"Getting todo item by id with id: {id}.");
+            logger.LogInformation("Getting todo item by id with id: {id}.", id);
             
             var data = todoDb.GetTodoItemById(id);
         
@@ -44,11 +56,11 @@ namespace MyFirst.Controllers
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(CreateTodoItem)}");
             
-            logger.LogInformation($"Creating new item with title: {todo.title}.");
+            logger.LogInformation("Creating new item with title: {todo.title}.", todo.title);
             
             // Move to constant folder.
             var defaultStatus = "In Progress";
-        
+
             var insertData = new TodoItem
             {
                 title = todo.title,
@@ -64,7 +76,7 @@ namespace MyFirst.Controllers
         { 
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(UpdateTaskStatus)}");
         
-            logger.LogInformation($"Updating status of id: {id} to {status.status}");
+            logger.LogInformation("Updating status of id: {id} to {status.status}", id ,status.status);
             
             var data = todoDb.GetTodoItemById(id);
         

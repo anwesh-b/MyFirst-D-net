@@ -24,4 +24,11 @@ namespace MyFirst.Model
     {
         public string status { get; init; }
     }
+
+    public class TodoFilterGenerator
+    {
+        public string? Id { get; init; }
+        
+        public string[]? Status { get; init; }
+    }
 }

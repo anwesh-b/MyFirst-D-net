@@ -9,6 +9,24 @@ namespace MyFirst.Database
     {
         private readonly IMongoCollection<TodoItem> _todoCollection;
 
+        private FilterDefinition<TodoItem> GenerateFilter(TodoFilterGenerator? filter)
+        {
+            var filterBuilder = Builders<TodoItem>.Filter;
+            var filterArray = new List<FilterDefinition<TodoItem>>();
+            
+            if (filter.Id != null)
+            {
+                filterArray.Add(filterBuilder.Eq(p => p.Id, filter.Id));
+            }
+
+            if (filter.Status != null)
+            {
+                filterArray.Add(filterBuilder.In(p => p.status, filter.Status));
+            }
+
+            return filterArray.Count != 0 ? filterArray.Aggregate((a, b) => a & b) : FilterDefinition<TodoItem>.Empty;
+        }
+
         public TodoDb(IOptions<MongoSettings> options)
         {
             var client = new MongoClient(options.Value.ConnectionUri);
@@ -16,10 +34,13 @@ namespace MyFirst.Database
             _todoCollection =  database.GetCollection<TodoItem>("todo");
         }
 
-        public List<TodoItem> GetTodoList()
+        public List<TodoItem> GetTodoList(TodoFilterGenerator? filter)
         {
-            var data = _todoCollection.Find(new BsonDocument(), new FindOptions
+            var filterBuild = this.GenerateFilter(filter);
+
+            var data = _todoCollection.Find(filterBuild, new FindOptions
             {
+
                 // Not sure what this does :thinking:
                 BatchSize = 3
             });
@@ -30,7 +51,9 @@ namespace MyFirst.Database
         
         public TodoItem GetTodoItemById(string id)
         {
-            var data = _todoCollection.Find(data => data.Id == id).FirstOrDefault();
+            var filter = GenerateFilter(new TodoFilterGenerator { Id = id }) ;
+            
+            var data = _todoCollection.Find(filter).FirstOrDefault();
         
             return data;
         }
@@ -45,7 +68,7 @@ namespace MyFirst.Database
         public async Task<int> UpdateItemStatus(string id, string status)
         {
             // Filter
-            var filter = Builders<TodoItem>.Filter.Eq(p=>p.Id, id);
+            var filter = GenerateFilter(new TodoFilterGenerator { Id = id }) ;
             // Data to udpate
             var update = Builders<TodoItem>.Update.Set("status", status);
             
