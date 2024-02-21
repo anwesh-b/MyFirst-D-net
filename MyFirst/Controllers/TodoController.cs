@@ -12,7 +12,7 @@ namespace MyFirst.Controllers
     public class TodoController(ILogger<ITodoController> logger, ITodoDb todoDb, IStringUtil stringUtil) : ControllerBase, ITodoController
     {
         [HttpGet("/")]
-        public List<TodoItem> GetTodoItemList(string? status)
+        public async Task<List<TodoItem>> GetTodoItemList(string? status)
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemList)}");
             var statuses = status != null ? stringUtil.GetCommaSeparatedValues(status) : null;
@@ -28,7 +28,7 @@ namespace MyFirst.Controllers
                 
             }
 
-            var data = todoDb.GetTodoList(new TodoFilterGenerator
+            var data = await todoDb.GetTodoList(new TodoFilterGenerator
             {
                 Status = statuses
             });
@@ -37,12 +37,12 @@ namespace MyFirst.Controllers
         }
 
         [HttpGet("/{id}")]
-        public TodoItem GetTodoItemById(string id)
+        public async Task<TodoItem> GetTodoItemById(string id)
         {
             using var scope = logger.BeginScope($"{nameof(TodoController)}.{nameof(GetTodoItemById)}");
             logger.LogInformation("Getting todo item by id with id: {id}.", id);
             
-            var data = todoDb.GetTodoItemById(id);
+            var data = await todoDb.GetTodoItemById(id);
         
             if (data == null) {
                 throw new Exception("Data not found");
@@ -78,7 +78,7 @@ namespace MyFirst.Controllers
         
             logger.LogInformation("Updating status of id: {id} to {status.status}", id ,status.status);
             
-            var data = todoDb.GetTodoItemById(id);
+            var data = await todoDb.GetTodoItemById(id);
         
             if (data == null) {
                 throw new Exception("Data not found");

@@ -34,14 +34,12 @@ namespace MyFirst.Database
             _todoCollection =  database.GetCollection<TodoItem>("todo");
         }
 
-        public List<TodoItem> GetTodoList(TodoFilterGenerator? filter)
+        public async Task<List<TodoItem>> GetTodoList(TodoFilterGenerator? filter)
         {
             var filterBuild = this.GenerateFilter(filter);
 
-            var data = _todoCollection.Find(filterBuild, new FindOptions
+            var data = await _todoCollection.FindAsync(filterBuild, new FindOptions<TodoItem>
             {
-
-                // Not sure what this does :thinking:
                 BatchSize = 3
             });
 
@@ -49,13 +47,13 @@ namespace MyFirst.Database
             return data.ToList();
         }
         
-        public TodoItem GetTodoItemById(string id)
+        public async Task<TodoItem> GetTodoItemById(string id)
         {
             var filter = GenerateFilter(new TodoFilterGenerator { Id = id }) ;
             
-            var data = _todoCollection.Find(filter).FirstOrDefault();
-        
-            return data;
+            var data = await _todoCollection.FindAsync(filter);
+            
+            return data.FirstOrDefault();
         }
         
         public async Task<TodoItem> CreateTodoItem(TodoItem todo) {
