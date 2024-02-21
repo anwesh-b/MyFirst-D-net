@@ -2,9 +2,11 @@ import TodoList from "../components/List";
 import useStore from "../store";
 
 function Completed() {
-  const { todoItems: data } = useStore();
+  const { getCompletedTasks } = useStore();
 
-  return <TodoList data={data} />
+  const completedData = getCompletedTasks();
+
+  return <TodoList data={completedData} />
 }
 
 export default Completed;

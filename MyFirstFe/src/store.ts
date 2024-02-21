@@ -1,21 +1,30 @@
-import { create } from "zustand";
+import { create, StateCreator, StoreApi, UseBoundStore } from "zustand";
 import { TodoItem } from "./types/todo";
 
-type State = {
+interface State {
   todoItems: TodoItem[],
   isLoading: boolean,
 };
 
-type Actions = {
+interface Actions {
   toggle: (id: string, action: string) => void,
   add: (item: TodoItem) => void,
   initiate: (items: TodoItem[]) => void,
-  setLoading: (isLoading: boolean) => void
+  setLoading: (isLoading: boolean) => void,
 };
 
-type GlobalState = State & Actions;
+interface DataManipulationActions {
+  getCompletedTasks: () => TodoItem[],
+  getInProgressTasks: () => TodoItem[],
+}
 
-const useStore = create<GlobalState>(
+interface GlobalState extends State, Actions, DataManipulationActions {
+
+};
+
+type Final = StateCreator<GlobalState>;
+
+const useStore:UseBoundStore<StoreApi<GlobalState>> = create<GlobalState>(
   (set) => ({
     todoItems: [],
     isLoading: false,
@@ -32,7 +41,7 @@ const useStore = create<GlobalState>(
         const index = state.todoItems.findIndex(item => item.id === id);
         state.todoItems[index].status = action;
         return {
-          todoItems: state.todoItems 
+          todoItems: state.todoItems
         };
       })
     },
@@ -41,6 +50,12 @@ const useStore = create<GlobalState>(
     },
     setLoading: (isLoading: boolean) => {
       set({ isLoading })
+    },
+    getCompletedTasks: () => {
+      return useStore().todoItems.filter((datum) => datum.status === "Completed")
+    },
+    getInProgressTasks: () => {
+      return useStore().todoItems.filter((datum) => datum.status === "In Progress")
     }
   })
 );
