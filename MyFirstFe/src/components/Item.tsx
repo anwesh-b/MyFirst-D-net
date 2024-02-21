@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Switch from '@mui/material/Switch';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -25,5 +23,4 @@ function Item(props: Readonly<{ datum: TodoItem }>) {
   </ListItem>
 }
 
-export default React.memo(Item);
-
+export default Item;

@@ -1,17 +1,19 @@
-import { create, StateCreator, StoreApi, UseBoundStore } from "zustand";
+import { create, StoreApi, UseBoundStore } from "zustand";
 import { TodoItem } from "./types/todo";
 
 interface State {
   todoItems: TodoItem[],
   isLoading: boolean,
-};
+  isAddingNewTask: boolean,
+}
 
 interface Actions {
   toggle: (id: string, action: string) => void,
   add: (item: TodoItem) => void,
   initiate: (items: TodoItem[]) => void,
   setLoading: (isLoading: boolean) => void,
-};
+  setAddingNewTask: (isLoading: boolean) => void,
+}
 
 interface DataManipulationActions {
   getCompletedTasks: () => TodoItem[],
@@ -19,15 +21,13 @@ interface DataManipulationActions {
 }
 
 interface GlobalState extends State, Actions, DataManipulationActions {
+}
 
-};
-
-type Final = StateCreator<GlobalState>;
-
-const useStore:UseBoundStore<StoreApi<GlobalState>> = create<GlobalState>(
+const useStore: UseBoundStore<StoreApi<GlobalState>> = create<GlobalState>(
   (set) => ({
     todoItems: [],
     isLoading: false,
+    isAddingNewTask: false,
     add: (item) => {
       set((state) => {
         state.todoItems.push(item);
@@ -51,10 +51,15 @@ const useStore:UseBoundStore<StoreApi<GlobalState>> = create<GlobalState>(
     setLoading: (isLoading: boolean) => {
       set({ isLoading })
     },
+    setAddingNewTask: (isAddingNewTask: boolean) => {
+      set({ isAddingNewTask })
+    },
     getCompletedTasks: () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       return useStore().todoItems.filter((datum) => datum.status === "Completed")
     },
     getInProgressTasks: () => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       return useStore().todoItems.filter((datum) => datum.status === "In Progress")
     }
   })

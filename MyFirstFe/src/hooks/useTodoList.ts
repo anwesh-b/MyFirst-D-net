@@ -1,13 +1,15 @@
 import { useEffect } from "react";
+
 import useStore from "../store";
 
 import http from '../utils/http';
 
 import config from "../config";
+
 import useMySnackBar from "./useSnackBar";
 
 function useTodoList() {
-  const { isLoading, todoItems, initiate, setLoading, toggle } = useStore();
+  const { isLoading, isAddingNewTask, todoItems, initiate, setLoading, setAddingNewTask, toggle, add } = useStore();
 
   const { success, error } = useMySnackBar();
 
@@ -31,7 +33,7 @@ function useTodoList() {
       }
 
     })();
-  }, [])
+  })
 
   const toggleTodo = async (id: string, action: "Completed" | "In Progress") => {
     const initialStatus = todoItems.find(item => item.id === id)?.status ?? "In Progress";
@@ -61,7 +63,30 @@ function useTodoList() {
     }
   }
 
-  return { todoItems, isLoading, toggleTodo };
+  const addTodo = async (title: string) => {
+    if (isAddingNewTask) {
+      return;
+    }
+
+    setAddingNewTask(true);
+    try {
+      const data = await http.post(
+        `${config.api.baseUrl}`,
+        {
+          title: title,
+        }
+      );
+
+      add(data.data);
+      success("Successfully created a new task");
+    } catch (e) {
+      error("Error adding a new task");
+    } finally {
+      setAddingNewTask(false);
+    }
+  }
+
+  return { todoItems, isLoading, isAddingNewTask, toggleTodo, addTodo };
 }
 
 export default useTodoList;

@@ -3,6 +3,8 @@ import { SnackbarProvider } from 'notistack';
 
 import Pages from './Pages'
 
+import "./App.css";
+
 function App() {
   return <BrowserRouter basename="">
     <SnackbarProvider maxSnack={3}>

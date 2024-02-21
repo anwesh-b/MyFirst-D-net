@@ -4,10 +4,12 @@ import Home from './pages/Home';
 import Progress from './pages/Progress';
 import Completed from './pages/Completed';
 import SideBar from './components/Sidebar';
+import AddTask from './components/AddTask';
 
 function PageWrapper({ children }) {
   return <div className="container">
     <SideBar />
+    <AddTask />
     <div>
       {children}
     </div>
