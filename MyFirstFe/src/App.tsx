@@ -1,12 +1,14 @@
+import { BrowserRouter } from 'react-router-dom';
+import { SnackbarProvider } from 'notistack';
 
 import Pages from './Pages'
 
-import { BrowserRouter } from 'react-router-dom';
-
 function App() {
   return <BrowserRouter basename="">
+    <SnackbarProvider maxSnack={3}>
       <Pages />
-    </BrowserRouter>
+    </SnackbarProvider>
+  </BrowserRouter>
 }
 
 export default App

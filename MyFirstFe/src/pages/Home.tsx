@@ -1,25 +1,13 @@
-import { useEffect, useState } from 'react';
-
 import TodoList from '../components/List';
-
-import http from '../utils/http';
-
-import config from "../config";
+import useTodoList from '../hooks/useTodoList';
 
 function Home() {
-  const [data, setData] = useState<any[]>([])
+  const { todoItems: data, isLoading } = useTodoList();
 
-  useEffect(() => {
-    (async () => {
-      const resp = await http.get(
-        config.api.baseUrl
-      );
-
-      setData(resp.data);
-    })();
-  }, [])
-
-  return <TodoList data={data} />
+  return <>
+    <TodoList data={data} />
+    {isLoading && <>Loading state</>}
+  </>
 }
 
 export default Home;
