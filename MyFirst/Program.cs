@@ -1,7 +1,9 @@
 using MyFirst.Controllers;
 using MyFirst.Database;
+using MyFirst.Middlewares;
 using MyFirst.Model;
 using MyFirst.Utils;
+
 
 namespace MyFirst
 {
@@ -14,27 +16,28 @@ namespace MyFirst
             builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoDB"));
             // Add services to the container.
             builder.Services.AddSingleton<MongoSettings>();
-            builder.Services.AddScoped<ITodoDb, TodoDb >();
-            builder.Services.AddScoped<ITodoController, TodoController >();
-            builder.Services.AddScoped<IStringUtil, StringUtil >();
+            builder.Services.AddScoped<ITodoDb, TodoDb>();
+            builder.Services.AddScoped<ITodoController, TodoController>();
+            builder.Services.AddScoped<IStringUtil, StringUtil>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            
-            var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
-                    policy  =>
+                    policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173", "http://localhost:5173/", "http://localhost:5173/*");
+                        policy.WithOrigins("http://localhost:5173", "http://localhost:5173/",
+                            "http://localhost:5173/*");
                         policy.AllowAnyMethod();
                         policy.AllowAnyHeader();
                     });
             });
-            
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -50,10 +53,12 @@ namespace MyFirst
 
             app.UseAuthorization();
 
-            app.UseExceptionHandler("/Error");
+            // app.UseExceptionHandler("/Error");
 
             app.MapControllers();
 
+            app.UseMiddleware<ExceptionMiddleware>();
+            
             app.Run();
         }
     }

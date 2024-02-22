@@ -2,6 +2,7 @@ using System.Drawing;
 using Microsoft.AspNetCore.Mvc;
 using MyFirst.Model;
 using MyFirst.Database;
+using MyFirst.Exceptions;
 using MyFirst.Utils;
 
 namespace MyFirst.Controllers
@@ -21,11 +22,18 @@ namespace MyFirst.Controllers
             {
                 var statusesLog = string.Join(", ", statuses); 
                 logger.LogInformation("Getting all todo list with statuses: {statusesLog}.", statusesLog);
+                
+                var areStatusesValid = statuses.All(status => status == "Completed" || status == "In Progress");
+
+                if (areStatusesValid != true)
+                {
+                    throw new BadRequestException("Invalid status");
+                }
+                
             }
             else
             {
                 logger.LogInformation("Getting all todo list.");
-                
             }
 
             var data = await todoDb.GetTodoList(new TodoFilterGenerator
@@ -45,7 +53,7 @@ namespace MyFirst.Controllers
             var data = await todoDb.GetTodoItemById(id);
         
             if (data == null) {
-                throw new Exception("Data not found");
+                throw new DataNotFoundException("Data not found");
             }
         
             return data;
@@ -81,7 +89,7 @@ namespace MyFirst.Controllers
             var data = await todoDb.GetTodoItemById(id);
         
             if (data == null) {
-                throw new Exception("Data not found");
+                throw new DataNotFoundException("Data not found");
             }
         
             await todoDb.UpdateItemStatus(id, status.status);
